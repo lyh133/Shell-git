@@ -1,0 +1,58 @@
+#!/bin/dash
+
+if ! [ -d ".shrug" ]
+then
+    echo "shrug-show: error: no .shrug directory containing shrug repository exists"
+    exit 1
+fi
+
+#check correct num args
+if [ "$#" -ne 1 ]
+then
+    echo "usage: shrug-show <commit>:<filename>"
+    exit 1
+fi
+
+#check exist ':'
+if [ "`echo $@ | egrep ':'`" = '' ]
+then
+    echo "shrug-show: error: invalid object $@"
+    exit 1
+fi
+
+#split by ':'
+commitNum=`echo $@ | cut -d ':' -f1`
+fileName=`echo $@ | cut -d ':' -f2`
+
+#if commit is omitted then content of file in index is printed
+if [ "$commitNum" = '' ]
+then
+    cd .shrug/index
+    #if not found in index then throw error
+    if ! [ -f "$fileName" ]
+    then
+        echo "shrug-show: error: '$fileName' not found in index"
+        exit 1
+    fi
+    cat $fileName
+
+else
+    cd .shrug/commits
+    #if commit number dont exist in commits then throw error
+    if ! [ -d "$commitNum" ]
+    then
+        echo "shrug-show: error: unknown commit '$commitNum'"
+        exit 1
+    fi
+    cd $commitNum
+    #if file name dont exist in the commit then throw error
+    if ! [ -f "$fileName" ]
+    then
+        echo "shrug-show: error: '$fileName' not found in commit $commitNum"
+        exit 1
+    fi
+    cat $fileName
+
+
+
+fi

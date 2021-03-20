@@ -1,0 +1,21 @@
+#!/bin/dash
+
+if ! [ -d ".shrug" ]
+then
+    echo "shrug-log: error: no .shrug directory containing shrug repository exists"
+    exit 1
+fi
+
+
+if [ "`ls .shrug/commits`" = "" ] 
+then
+    echo "shrug-log: error: your repository does not have any commits yet"
+    exit 1
+fi
+
+
+#print the message in reverse
+tac .shrug/message
+
+
+

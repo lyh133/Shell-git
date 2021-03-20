@@ -1,0 +1,52 @@
+#!/bin/dash
+
+if [ "`ls .shrug/commits`" = "" ] 
+then
+    echo "shrug-rm: error: your repository does not have any commits yet"
+    exit 1
+fi
+
+commitNum=`cat .shrug/log`
+
+#remove from index
+cd .shrug/index
+for file in "$@"
+do
+    if [ "$file" !=  "--cached" ] && [ "$file" !=  "--force" ]
+    then
+        if ! [ -f "$file" ]
+        then
+            echo "shrug-rm: error: '$file' is not in the shrug repository"
+            exit 1
+        fi
+        #warn if going lose work
+        if [ "$1" != "--force" ] && [ "$1" != "--cached" ]
+        then
+            cd ../commits/$commitNum
+            if ! [ -f "$file" ]
+            then
+                echo "shrug-rm: error: '$file' has changes staged in the index"
+                exit 1
+            fi
+            cd ../../index
+        fi
+
+        rm $file
+    fi
+
+done
+
+cd ../..
+#remove from current directory only if not --cached
+if [ "$1" != "--cached" ] && [ "$2" != "--cached" ]
+then
+    for file in "$@"
+    do
+        if [ "$file" !=  "--cached" ] 
+        then
+            rm $file
+        fi
+
+    done
+fi
+

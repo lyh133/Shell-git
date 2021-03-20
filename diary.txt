@@ -1,0 +1,12 @@
+﻿10/7 11am - 2pm : read specifications
+10/7 4pm - 6pm : wrote a bit of init
+10/7 8pm-12pm : worked on specifications and add
+13/7/ 10am -12pm completed add and working on commit
+13/7 4pm - 7 pm completed commit didnt test
+13/7 10pm -12pm completed commit and log tested
+14/7 2pm-4pm completed shrug-show and tested. subset 0 passed all autotest
+14/7 9pm-11pm completed commit -a and did one test00.sh
+15/7 11am - 3pm fixed some part in shrug-add 
+wrote shrug-rm, but shrug-rm buggy
+wrote test 01 02 03 04 05
+I dont want to do this anymore, I have to move on to other Assignments 

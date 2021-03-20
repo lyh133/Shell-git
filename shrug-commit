@@ -1,0 +1,146 @@
+#!/bin/dash
+
+if ! [ -d ".shrug" ]
+then
+    echo "shrug-add: error: no .shrug directory containing shrug repository exists"
+    exit 1
+fi
+
+#check arg num appropriet
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]
+then
+    echo "usage: shrug-commit [-a] -m commit-message"
+    exit 1
+fi
+
+
+
+#argument already checked if valid = true
+valid="false"
+
+#incase of 3 args
+if [ "$#" -eq 3 ]
+then
+    #check first is -a
+    if [ "$1" != "-a" ]
+    then
+        echo "usage: shrug-commit [-a] -m commit-message"
+        exit 1
+    fi
+    #check second is -m
+    if [ "$2" != "-m" ]
+    then
+        echo "usage: shrug-commit [-a] -m commit-message"
+        exit 1
+    fi
+
+    files=`ls .shrug/index`
+    for file in $files
+    do
+        if [ -f "$file" ]
+        then 
+            cp "$file" ".shrug/index"
+
+        fi
+
+    done
+
+    
+    valid="true"
+
+
+fi
+
+
+
+
+
+#in this situation, -a is not used
+#check first is -m or valid if argument already checked
+if [ "$1" != "-m" ] && [ "$valid" = "false" ]
+then
+    echo "usage: shrug-commit [-a] -m commit-message"
+    exit 1
+fi
+#get all files in index
+files=`ls .shrug/index`
+#if index empty then error
+if [ "$files" = '' ]
+then
+    echo "nothing to commit"
+    exit 1
+fi
+
+#handle when commit is empty, first time commit
+if [ "`ls .shrug/commits`" = "" ] 
+then
+    
+    cd .shrug/commits
+    mkdir 0
+
+    for file in $files
+    do
+        cp "../index/$file" "0"
+    done
+    #create log
+    cd ..
+    echo "0" > log
+    chmod 755 log
+
+    #insert message
+    echo "0 $2" >> message
+    echo "Committed as commit 0"
+
+#else handles other commits after the initial commit
+else 
+    commitNum=`cat .shrug/log`
+    #go to the last committed files
+    cd .shrug/commits/$commitNum
+    changed="false"
+    #if there exist files in index also in commits and is different
+    #then changed = true
+    for file in $files
+    do
+        #files in index also exist in commits?
+        if [ -f "$file" ]
+        then
+            #dif is not empty if two files are different, therefore, its "changed"
+            dif=`diff -q $file ../../index/$file`
+            if [ "$dif" != "" ]
+            then
+                changed="true"
+            fi
+        else 
+            #if there exist a file in index but not in commits then its changed
+            changed="true"
+
+        fi
+    done
+    #if unchanged then exit 
+    if [ "$changed" = "false" ]
+    then
+        echo "nothing to commit"
+        exit 1
+    fi
+
+    #starts copying 
+    cd ..
+    commitNum=`expr $commitNum + 1`
+    mkdir $commitNum
+    for file in $files
+    do
+        cp "../index/$file" "$commitNum"
+
+    done
+    #update log
+    cd ..
+    rm log
+    echo "$commitNum" > log
+    chmod 755 log
+    #insert message
+    echo "$commitNum $2" >> message
+    echo "Committed as commit $commitNum"
+
+fi
+
+
